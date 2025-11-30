@@ -1,8 +1,21 @@
 // src/App.jsx
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
-// Importe a página Dashboard quando criarmos
-// import DashboardPage from './pages/DashboardPage';
+import DashboardPage from "./pages/DashboardPage";
+
+// Componente para proteger rotas
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem("jwtToken");
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
 
 function App() {
   return (
@@ -11,11 +24,28 @@ function App() {
         <Routes>
           {/* Rotas Públicas */}
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/" element={<LoginPage />} />{" "}
-          {/* Rota raiz aponta para login */}
-          {/* Rotas Protegidas (Futuramente) */}
-          {/* <Route path="/dashboard" element={<DashboardPage />} /> */}
-          {/* ... outras rotas ... */}
+
+          {/* Rota Raiz - Redireciona para o Dashboard se logado, senão para Login */}
+          <Route
+            path="/"
+            element={
+              localStorage.getItem("jwtToken") ? (
+                <Navigate to="/dashboard" replace />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
+
+          {/* Rotas Protegidas */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </div>
     </Router>
