@@ -2,7 +2,14 @@
 import React, { useState, useEffect } from "react";
 import DashboardLayout from "../layouts/DashboardLayout";
 import api from "../services/api";
-import { PlusCircle, Edit, Trash2, Search, RefreshCw } from "lucide-react";
+import {
+  PlusCircle,
+  Edit,
+  Trash2,
+  Search,
+  RefreshCw,
+  Smartphone,
+} from "lucide-react";
 
 function PessoasPage() {
   const [pessoas, setPessoas] = useState([]);
@@ -16,7 +23,8 @@ function PessoasPage() {
   const [formState, setFormState] = useState({
     nome: "",
     documento: "",
-    tipo: "Funcionario", // Valor padrão
+    telefone: "", // Adicionado campo Telefone
+    tipo: "Visitante", // Valor padrão ajustado para Visitante, mais comum em portaria
   });
   const [formError, setFormError] = useState("");
 
@@ -56,12 +64,18 @@ function PessoasPage() {
       setFormState({
         nome: pessoa.nome,
         documento: pessoa.documento,
+        telefone: pessoa.telefone || "", // Preenche telefone
         tipo: pessoa.tipo,
       });
     } else {
       // Modo Criação
       setEditingPessoa(null);
-      setFormState({ nome: "", documento: "", tipo: "Funcionario" });
+      setFormState({
+        nome: "",
+        documento: "",
+        telefone: "",
+        tipo: "Visitante",
+      });
     }
     setIsModalOpen(true);
   };
@@ -76,12 +90,18 @@ function PessoasPage() {
     setFormError("");
 
     try {
+      const payload = {
+        ...formState,
+        // Garantir que ID não seja enviado no payload para criação ou atualização
+        id: undefined,
+      };
+
       if (editingPessoa) {
         // UPDATE
-        await api.put(`/pessoas/${editingPessoa.id}`, formState);
+        await api.put(`/pessoas/${editingPessoa.id}`, payload);
       } else {
         // CREATE
-        await api.post("/pessoas", formState);
+        await api.post("/pessoas", payload);
       }
 
       handleCloseModal();
@@ -102,7 +122,8 @@ function PessoasPage() {
         fetchPessoas(); // Atualiza a lista
       } catch (err) {
         const message =
-          err.response?.data?.error || "Erro ao excluir a pessoa.";
+          err.response?.data?.error ||
+          "Erro ao excluir a pessoa. Verifique se não há movimentações associadas.";
         alert(message);
       }
     }
@@ -112,7 +133,8 @@ function PessoasPage() {
   const filteredPessoas = pessoas.filter(
     (pessoa) =>
       pessoa.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      pessoa.documento.toLowerCase().includes(searchTerm.toLowerCase())
+      pessoa.documento.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      pessoa.telefone?.toLowerCase().includes(searchTerm.toLowerCase()) // Adiciona busca por telefone
   );
 
   // ----------------------------------------------------
@@ -131,7 +153,7 @@ function PessoasPage() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Buscar por nome ou documento..."
+              placeholder="Buscar por nome, documento ou telefone..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500"
@@ -177,6 +199,9 @@ function PessoasPage() {
                     Documento
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Telefone {/* Coluna Telefone */}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Tipo
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -192,6 +217,9 @@ function PessoasPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-500">
                       {pessoa.documento}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-500">
+                      {pessoa.telefone} {/* Exibe Telefone */}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
@@ -252,7 +280,7 @@ function PessoasPage() {
 }
 
 // ----------------------------------------------------
-// Componente Modal (Movido para um arquivo separado em produção real)
+// Componente Modal
 // ----------------------------------------------------
 const PessoaModal = ({
   isOpen,
@@ -315,6 +343,25 @@ const PessoaModal = ({
               required
               value={formState.documento}
               onChange={handleFormChange}
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-sm"
+            />
+          </div>
+
+          {/* Telefone */}
+          <div>
+            <label
+              htmlFor="telefone"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Telefone
+            </label>
+            <input
+              type="text"
+              name="telefone"
+              id="telefone"
+              value={formState.telefone}
+              onChange={handleFormChange}
+              placeholder="(99) 99999-9999"
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-sm"
             />
           </div>
