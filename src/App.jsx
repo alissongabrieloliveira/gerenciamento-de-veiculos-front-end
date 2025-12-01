@@ -8,6 +8,7 @@ import {
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import PessoasPage from "./pages/PessoasPage";
+import VeiculosPage from "./pages/VeiculosPage";
 
 // Componente para proteger rotas
 const ProtectedRoute = ({ children }) => {
@@ -54,6 +55,16 @@ function App() {
             element={
               <ProtectedRoute>
                 <PessoasPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Rota de Veículos */}
+          <Route
+            path="/veiculos"
+            element={
+              <ProtectedRoute>
+                <VeiculosPage />
               </ProtectedRoute>
             }
           />
