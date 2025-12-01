@@ -10,6 +10,7 @@ import DashboardPage from "./pages/DashboardPage";
 import PessoasPage from "./pages/PessoasPage";
 import VeiculosPage from "./pages/VeiculosPage";
 import MovimentacoesPage from "./pages/MovimentacoesPage";
+import RelatoriosPage from "./pages/RelatoriosPage";
 
 // Componente para proteger rotas
 const ProtectedRoute = ({ children }) => {
@@ -76,6 +77,16 @@ function App() {
             element={
               <ProtectedRoute>
                 <MovimentacoesPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Rota de Relatórios */}
+          <Route
+            path="/relatorios"
+            element={
+              <ProtectedRoute>
+                <RelatoriosPage />
               </ProtectedRoute>
             }
           />
