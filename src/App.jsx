@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
+import PessoasPage from "./pages/PessoasPage";
 
 // Componente para proteger rotas
 const ProtectedRoute = ({ children }) => {
@@ -43,6 +44,16 @@ function App() {
             element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/*Rota de Pessoas */}
+          <Route
+            path="/pessoas"
+            element={
+              <ProtectedRoute>
+                <PessoasPage />
               </ProtectedRoute>
             }
           />
